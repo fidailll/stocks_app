@@ -45,6 +45,9 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   GetRequest _getRequest = GetRequest();
   List<dynamic> listStock = [];
+  List<dynamic> listStockCache = [];
+  final _textController = TextEditingController();
+  final _formKeyEdit = GlobalKey<FormState>();
 
   @override
   void initState() {
@@ -56,8 +59,9 @@ class _MyHomePageState extends State<MyHomePage> {
     _getRequest.stockSymbol();
 
     setState(() {
-      Timer(Duration(seconds: 15), () {
+      Timer(Duration(seconds: 10), () {
         listStock = _getRequest.listStock;
+        listStockCache = _getRequest.listStock;
         print(listStock);
       });
     });
@@ -75,20 +79,57 @@ class _MyHomePageState extends State<MyHomePage> {
             Text(widget.title),
             Container(),
             Container(
-              margin: EdgeInsets.only(top: 10, bottom: 10),
+              width: MediaQuery.of(context).size.width / 2,
+              height: 40,
+              //margin: EdgeInsets.only(top: 1, bottom: 1),
               decoration: BoxDecoration(
                   color: Colors.yellow[400],
                   borderRadius: BorderRadius.circular(16),
                   boxShadow: const []),
-              width: MediaQuery.of(context).size.width / 2,
-              child: TextFormField(
-                // controller: _loginController,
-                //cursorColor: Colors.black,
-                //strutStyle: StrutStyle()
-                decoration: InputDecoration(
-                  labelText: 'Поиск',
-                  icon: Icon(CupertinoIcons.search, color: Colors.white70),
-                  labelStyle: const TextStyle(color: Colors.white70),
+              child: Form(
+                key: _formKeyEdit,
+                child: TextFormField(
+                  controller: _textController,
+                  cursorColor: Colors.black,
+                  //strutStyle: StrutStyle()
+                  decoration: InputDecoration(
+                    border: InputBorder.none,
+                    //enabled: false,
+                    hintText: 'Поиск',
+                    hintStyle: TextStyle(color: Colors.white),
+                    //focusColor: Colors.black,
+                    icon: Icon(CupertinoIcons.search, color: Colors.white70),
+                    labelStyle: const TextStyle(color: Colors.white70),
+                  ),
+                  onFieldSubmitted: (value) {
+                    // print(_textController.text);
+                    //print(listStock[5]['description'].length);
+                    if (_textController.text != '') {
+                      listStock = [];
+                      for (int i = 0; i < listStockCache.length; i++) {
+                        if (_textController.text ==
+                                listStockCache[i]['description'] ||
+                            _textController.text ==
+                                listStockCache[i]['displaySymbol']) {
+                          //print(listStock[i]['description']);
+                          var element = listStockCache[i];
+                          // print(listStockCache);
+                          setState(() {
+                            listStock.add(element);
+                            //  print(listStock);
+                          });
+                        }
+                      }
+                      // setState(() {
+                      //   listStock.clear();
+                      //  });
+                    } else {
+                      setState(() {
+                        //  print(listStockCache);
+                        listStock = listStockCache;
+                      });
+                    }
+                  },
                 ),
               ),
             )
@@ -136,16 +177,14 @@ class _MyHomePageState extends State<MyHomePage> {
                         margin: EdgeInsets.only(
                             left: 5, right: 5, top: 1, bottom: 1),
                         alignment: Alignment.topLeft,
-                        child: Text(
-                            '${_getRequest.listStock[index]['displaySymbol']}',
+                        child: Text('${listStock[index]['displaySymbol']}',
                             style: TextStyle(fontSize: 25)),
                       ),
                       Container(
                         margin: EdgeInsets.only(
                             left: 5, right: 5, top: 1, bottom: 1),
                         alignment: Alignment.topLeft,
-                        child: Text(
-                            '${_getRequest.listStock[index]['description']}',
+                        child: Text('${listStock[index]['description']}',
                             style: TextStyle(fontSize: 15)),
                       )
 
@@ -173,7 +212,7 @@ class _MyHomePageState extends State<MyHomePage> {
       );
       return myList;
     } else {
-      return Text('download');
+      return Text('Идет загрузка...');
     }
   }
 }
