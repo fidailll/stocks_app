@@ -4,10 +4,11 @@ import 'dart:convert';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:stocks_app/stock_symbol.dart';
+import 'package:stocks_app/trades.dart';
 
 /// Окно акци1
-class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
+class MyStocks extends StatelessWidget {
+  const MyStocks({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -29,21 +30,21 @@ class MyApp extends StatelessWidget {
           selectedItemColor: Colors.green[800],
         ),
       ),
-      home: const MyHomePage(title: 'Акции США'),
+      home: const MyStocksPage(title: 'Акции США'),
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({Key? key, required this.title}) : super(key: key);
+class MyStocksPage extends StatefulWidget {
+  const MyStocksPage({Key? key, required this.title}) : super(key: key);
   final String title;
 
   @override
-  State<MyHomePage> createState() => _MyHomePageState();
+  State<MyStocksPage> createState() => _MyStocksPageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
-  GetRequest _getRequest = GetRequest();
+class _MyStocksPageState extends State<MyStocksPage> {
+  StockSymbol _getRequest = StockSymbol();
   List<dynamic> listStock = [];
   List<dynamic> listStockCache = [];
   final _textController = TextEditingController();
@@ -52,11 +53,12 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   void initState() {
     _myRequest();
+    Trades().channel;
     super.initState();
   }
 
   Future<void> _myRequest() async {
-    _getRequest.stockSymbol();
+    _getRequest.stockSymbol(context);
 
     setState(() {
       Timer(Duration(seconds: 10), () {
@@ -154,7 +156,9 @@ class _MyHomePageState extends State<MyHomePage> {
         itemBuilder: (context, index) {
           return Column(
             children: [
-              Container(
+              FlatButton(
+                onPressed: () {},
+                child: Container(
                   width: MediaQuery.of(context).size.width,
                   decoration: BoxDecoration(
                       color: Colors.white,
@@ -205,7 +209,9 @@ class _MyHomePageState extends State<MyHomePage> {
                       // SizedBox(height: 10),
                       // Text('${_getRequest.listStock[index]['type']}'),
                     ],
-                  )),
+                  ),
+                ),
+              ),
             ],
           );
         },
